@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*- 
-
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
@@ -60,34 +59,28 @@ while True:
 	# Extraia a face da imagem obtida da câmera
 	face = face_extractor(frame)
 
-	if ret:
-		try:
-			# Faça os ajustes necessários para classificá-la no classifcador treinado
-			face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
-			ids, confidence = model.predict(face)
+	try:
+		# Faça os ajustes necessários para classificá-la no classifcador treinado
+		face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
 
-			# Estabeleça um algoritmo para concluir se o resultado é 'Sucesso', candidato identificado ou 'Não Indetificado' para quando não for localizado o candidato
-			if confidence < 500:
-				confidence = int(100*(1-confidence/300))
-				text = str(confidence) + "% de certeza"
-				cv2.putText(frame, text, (100, 120), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
+		ids, confidence = model.predict(face)
 
-			if confidence > 75:
-				text = persons[0] + " reconhecido"
-				cv2.putText(frame, text, (100, 150), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 2)
-				cv2.imshow('Imagem', frame)
-			else:
-				# Analise também situações onde a face não é identificada
-				cv2.putText(frame, "Nao reconhecido", (100, 150), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255), 2)
-				cv2.imshow('Imagem', frame)
-		except:
-			cv2.putText(frame, "Nenhuma face encontrada", (100, 150), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255), 2)
-			cv2.imshow('Imagem', frame)
-			pass
-	
-		
+		# Estabeleça um algoritmo para concluir se o resultado é 'Sucesso', candidato identificado ou 'Não Indetificado' para quando não for localizado o candidato
+		if confidence < 40:
+			text = persons[0] + " reconhecido"
+			cv2.putText(frame, text, (100, 150), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 2)
+			cv2.imwrite("success_candidate.jpg", frame)
+		else:
+			# Analise também situações onde a face não é identificada
+			cv2.putText(frame, "Nao reconhecido", (100, 150), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255), 2)
+	except:
+		cv2.putText(frame, "Nenhuma face encontrada", (100, 150), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255), 2)
+		pass
+
+	cv2.imshow('Imagem', frame)
+
 	# Se for teclado Enter (tecla 13) deverá sair do loop e encerrar a captura de imagem    
-	if cv2.waitKey(1) == 13: #13 is the Enter Key
+	if cv2.waitKey(1) == 13:
 		break
 		
 cap.release()
